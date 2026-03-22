@@ -28,16 +28,16 @@ Nisiro is not a tax software. It is a record‑keeping and computation‑exposur
    PHP 8.4
    Laravel (latest stable)
    Laravel Livewire (UI interaction layer)
-   PostgreSQL 15+
+   MySQL 8.0+
    Redis (optional, non‑critical paths only)
    3.2 Multitenancy
-   stancl/tenancy
-   Tenant isolation via PostgreSQL schemas, not tenant IDs
-   One database, many schemas
+   Single Database (Row-level Isolation)
+   Tenant isolation via unique ID (tenant_id) scoping
+   One database, shared tables
    Rationale:
-   Large data volumes per tenant
-   Clear physical separation
-   Easier archival and compliance isolation
+   Simpler onboarding and standalone installations
+   Ease of maintenance and cloud-native scaling
+   Unified schema for easier updates
 
 4. High‑Level System Architecture
    4.1 Architectural Style
@@ -60,7 +60,7 @@ Each module is independently understandable and testable.
 5. Multitenancy Design
    5.1 Tenant Lifecycle
    Tenant creation triggers:
-   Schema creation
+   Record creation in `tenants` table
    Base configuration seeding
    Default roles and permissions
    Tenant context resolution:
@@ -68,8 +68,9 @@ Each module is independently understandable and testable.
    Custom domain
    Explicit header (for offline sync)
    5.2 Cross‑Tenant Isolation Rules
-   No cross‑schema queries
-   No shared tables except:
+   Strict Row-Level Scoping via `tenant_id`
+   No cross-tenant data access without explicit system-level permission
+   Shared tables include:
    tenants
    system_users
    system_audit_logs

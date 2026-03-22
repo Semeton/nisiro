@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
@@ -77,6 +79,26 @@ class AuthenticationTest extends TestCase
         $response = $this->actingAs($user)->post(route('logout'));
 
         $response->assertRedirect(route('home'));
+
+        $this->assertGuest();
+    }
+
+    public function test_user_cannot_authenticate_under_a_different_tenant(): void
+    {
+        $tenantA = $this->createTenant(['name' => 'Tenant A']);
+        $tenantB = $this->createTenant(['name' => 'Tenant B']);
+
+        $userA = User::factory()->forTenant($tenantA)->create([
+            'email' => 'user@tenant-a.test',
+        ]);
+
+        // Simulate a request arriving under Tenant B's context.
+        $this->forTenant($tenantB);
+
+        $this->post(route('login.store'), [
+            'email' => $userA->email,
+            'password' => 'password',
+        ]);
 
         $this->assertGuest();
     }

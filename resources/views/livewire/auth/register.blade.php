@@ -1,12 +1,24 @@
 <x-layouts.auth>
     <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+        <x-auth-header :title="__('Create your organization')" :description="__('Enter your organization and account details to get started')" />
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
+            <!-- Organization Name -->
+            <flux:input
+                name="organization_name"
+                :label="__('Organization name')"
+                :value="old('organization_name')"
+                type="text"
+                required
+                autofocus
+                autocomplete="organization"
+                :placeholder="__('Acme Inc.')"
+            />
+
             <!-- Name -->
             <flux:input
                 name="name"
@@ -14,7 +26,6 @@
                 :value="old('name')"
                 type="text"
                 required
-                autofocus
                 autocomplete="name"
                 :placeholder="__('Full name')"
             />

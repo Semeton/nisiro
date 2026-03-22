@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Modules\System\Models\Tenant;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -54,6 +57,16 @@ class UserFactory extends Factory
             'two_factor_secret' => encrypt('secret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
+        ]);
+    }
+
+    /**
+     * Associate the user with the given tenant.
+     */
+    public function forTenant(Tenant $tenant): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tenant_id' => $tenant->id,
         ]);
     }
 }
